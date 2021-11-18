@@ -83,13 +83,13 @@
       <br>
 
       <!-- TODO make progress dynamic, only show when game starts -->
-      <progress class="progress is-primary" value="0" max="151"></progress>
+      <progress class="progress is-primary" :value="correct.length" max="151"></progress>
       <p>Progress: {{ Math.round((progress + Number.EPSILON) * 100) / 100 }}%</p>
 
       <hr>
 
       <div v-if="correct.length > 0">
-        <h2 class="subtitle">Correct</h2>
+        <h2 class="subtitle has-text-left is-underlined">Correct</h2>
         <div class="columns is-flex-wrap-wrap">
           <div v-for="(poke, index) in correct" :key="index" class="column is-one-fifth has-text-primary">{{ poke }}</div>
         </div>
@@ -97,7 +97,7 @@
 
       <div v-if="incorrect.length > 0">
         <hr>
-        <h2 class="subtitle">Incorrect</h2>
+        <h2 class="subtitle has-text-left is-underlined">Incorrect</h2>
         <div class="columns is-flex-wrap-wrap">
           <div v-for="(poke, index) in incorrect" :key="index" class="column is-one-fifth has-text-danger">{{ poke }}</div>
         </div>
