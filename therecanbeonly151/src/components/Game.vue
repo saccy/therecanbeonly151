@@ -1,8 +1,5 @@
 <template>
   <div>
-    <img src="../assets/pika.png" width="200" height="200" />
-    <h1 class="title">Original pokemans is best pokemans</h1>
-    <hr>
 
     <div v-show="!started">
       
@@ -42,7 +39,7 @@
           
           <div class="columns">
             <div class="column is-half is-offset-one-quarter">
-              <button v-show="!timerEnabled" class="button is-primary is-fullwidth" @click="setTimer(180)">Start</button>
+              <button v-show="!timerEnabled" class="button is-primary is-fullwidth" @click="startGame(180)">Start</button>
             </div>
           </div>
         
@@ -65,7 +62,7 @@
 
       <div class="columns">
         <div class="column box is-one-third is-offset-one-third">
-          <p><progress class="progress is-warning" :value="timerCount" max="180"></progress></p>
+          <p><progress class="progress is-warning" :value="gameTime" max="180"></progress></p>
           <br>
           <h2 class="subtitle">{{ timeFormat }} (mutliplier x{{ pointsMultiplier }})</h2>
         </div>
@@ -101,7 +98,7 @@
 
       <div class="columns">
         <div class="column is-one-third is-offset-one-third">
-          <button v-show="timerEnabled" class="button is-one-third is-danger is-fullwidth" @click="stopTimer()">End game</button>
+          <button v-show="timerEnabled" class="button is-one-third is-danger is-fullwidth" @click="endGame()">End game</button>
         </div>
       </div>
 
@@ -132,19 +129,12 @@ export default {
       correct: [],
       incorrect: [],
       showTick: false,
-      playerName: null,
-      playerNameValid: false,
-      playerNameSubmitted: false,
-      players_api_key: import.meta.env.VITE_PLAYERS_API_KEY,
-      players_collection: import.meta.env.VITE_PLAYERS_COLLECTION_ID,
-      players: {},
-      playerNamesArr: [],
-      bin_id: null,
+
       highScore: 0,
 
       // TODO split these to CountDown component
       timerEnabled: false,
-      timerCount: null,
+      gameTime: 180,
       timeMin: null,
       timeSec: null,
       finishTime: null,
@@ -153,58 +143,18 @@ export default {
     }
   },
   methods: {
-    validatePlayerName(value) {
-      if(!this.playerNamesArr.includes(value) && value != ''){
-        this.playerNameValid = true;
-      }
-      else {
-        this.playerNameValid = false;
-      }
-    },
-    setPlayerName() {
-      if (this.playerNameValid) {
-        console.log(this.playerName)
-        localStorage.playerName = this.playerName;
-        this.playerNameSubmitted = true;
-        const json_data = {
-          [this.playerName]: { 
-            "high_score": 0, 
-            "attempts": 0
-          }
-        }
-        const playersUrl = 'https://api.jsonbin.io/v3/b';
-        fetch(playersUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Master-key': this.players_api_key,
-            'X-Collection-Id': this.players_collection,
-            'X-Bin-Name': this.playerName,
-          },
-          body: JSON.stringify(json_data)
-        })
-        .then(response => {
-          console.log(response);
-          return response.json();
-        })
-        .then(player => {
-          console.log(player);
-        })
-        .catch(err => {
-            console.log(err);
-        });
-      }
-    },
+
     playTransition() {
       this.showTick = true;
       setTimeout(() => {
           if(this.showTick) {
-            console.log('waiting');
+            // console.log('waiting');
             this.showTick = false;
           }
       }, 500)
     },
-    onSubmit() {
+
+    submitPokemon() {
       var formattedName = this.pokemonName.toLowerCase();
       if (this.pokemon.includes(formattedName) && !this.correct.includes(formattedName)) {
         this.points += this.pointsMultiplier * 1;
@@ -214,32 +164,28 @@ export default {
       }
     },
 
-    // TODO split these to CountDown component
-    setTimer(secs) {
-        this.timerEnabled = true;
-        this.timerCount = secs;
-        this.startTimer();
-    },
-    startTimer() {
+    // TODO split these to GameTime component
+    startGame() {
+      this.timerEnabled = true;
       this.started = true;
       if(this.timerEnabled) {
         setTimeout(() => {
-            if(this.timerCount) {
-                this.timerCount -= 1;
-                this.timeMin = Math.floor(this.timerCount / 60);
-                this.timeSec = this.timerCount % 60;
+            if(this.gameTime) {
+                this.gameTime -= 1;
+                this.timeMin = Math.floor(this.gameTime / 60);
+                this.timeSec = this.gameTime % 60;
                 this.timeFormat = `${this.timeMin}m ${this.timeSec}s`;
-                this.startTimer();
+                this.startGame();
             }
         }, 1000)
       }
     },
-    stopTimer() {
+    endGame() {
         this.finished = true,
         this.started = false,
         this.timerEnabled = false;
-        this.finishTime = this.timerCount;
-        this.timerCount = null;
+        this.finishTime = this.gameTime;
+        this.gameTime = null;
         this.timeMin = null;
         this.timeSec = null;
         this.timeFormat = null;
@@ -252,31 +198,31 @@ export default {
             console.log(this.highScore)
           }
         }
-
     },
-    // End CountDown component
+    // End GameTime component
+
   },
   computed: {
     progress() {
         return (this.correct.length / 151 * 100)
     },
     pointsMultiplier() {
-      if (this.timerCount > 150) {
+      if (this.gameTime > 150) {
         return 6
       }
-      else if (this.timerCount > 120 && this.timerCount <= 150 ) {
+      else if (this.gameTime > 120 && this.gameTime <= 150 ) {
         return 5
       }
-      else if (this.timerCount > 90 && this.timerCount <= 120 ) {
+      else if (this.gameTime > 90 && this.gameTime <= 120 ) {
         return 4
       }
-      else if (this.timerCount > 60 && this.timerCount <= 90 ) {
+      else if (this.gameTime > 60 && this.gameTime <= 90 ) {
         return 3
       }
-      else if (this.timerCount > 30 && this.timerCount <= 60 ) {
+      else if (this.gameTime > 30 && this.gameTime <= 60 ) {
         return 2
       }
-      else if (this.timerCount > 0 && this.timerCount <= 30 ) {
+      else if (this.gameTime > 0 && this.gameTime <= 30 ) {
         return 1
       }
       else {
@@ -323,20 +269,19 @@ export default {
   },
   watch: {
     pokemonName() {
-      this.onSubmit();
+      this.submitPokemon();
     },
     playerName(value) {
       this.playerName = value;
       this.validatePlayerName(value);
     },
-    timerCount() {
-      if (this.timerCount == 0) {
-        this.stopTimer();
+    gameTime() {
+      if (this.gameTime == 0) {
+        this.endGame();
       }
     }
   },
   mounted() {
-    console.log(`${import.meta.env.MODE} mode`)
     if (localStorage.playerName) {
       this.playerName = localStorage.playerName;
       this.playerNameSubmitted = true;
