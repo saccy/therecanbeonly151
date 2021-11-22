@@ -1,4 +1,5 @@
 <template>
+<div>
     <div class="field is-grouped" >
         <p class="control is-expanded">
             <input @keyup.enter="setPlayerName" class="input" v-model="playerNameTemp" type="text" placeholder="Input new player name">
@@ -14,38 +15,40 @@
             </a>
         </p>
     </div>
+    <p v-show="errorMsg" class="has-text-danger">{{ errorMsg }}, try again</p>
+</div>
 </template>
 
 <script>
 export default {
+    props: {
+        jsonbin_api_key: {
+            type: String,
+            required: true
+        },
+        jsonbin_collection: {
+            type: String,
+            required: true
+        }
+    },
     data() {
         return {
-            // player: {
-            //     name: '',
-            //     attempts: {
-            //         start_time: null,
-            //         play_time: null,
-            //         correct: 0,
-            //         points: 0,
-            //         badges: [],
-            //     },
-            //     high_score: 0,
-            // },
             players: {},
             player: null,
             playerName: null,
+            playerID: null,
             playerNameTemp: null,
             playerNamesArr: [],
             playerNameValid: false,
             playerJSONBinId: null,
-            jsonbin_api_key: import.meta.env.VITE_JSONBIN_API_KEY,
-            jsonbin_collection: import.meta.env.VITE_JSONBIN_COLLECTION_ID,
+            errorMsg: null,
         }
     },
     methods: {
 
         emitPlayerName(){
-            this.$emit('setPlayerName',this.playerName)
+            const player = {'name': this.playerName, 'id': this.playerID, 'players': this.players}
+            this.$emit('setPlayerName', player)
         },
 
         validatePlayerName(value) {
@@ -60,11 +63,6 @@ export default {
         // Sets session data for current player and saves data in jsonbin
         setPlayerName() {
             if (this.playerNameValid) {
-                this.playerName = this.playerNameTemp;
-                this.playerNameTemp = null;
-                localStorage.playerName = this.playerName;
-                this.playerNameSubmitted = true;
-                this.emitPlayerName();
 
                 // const playerData = {
                 //     [this.playerName]: { 
@@ -73,7 +71,13 @@ export default {
                 //     }
                 // }
 
-                const playerData = {}
+                this.playerNameTemp = this.playerNameTemp.trim();
+
+                const playerData = {
+                    [this.playerNameTemp]: {
+                        'high_score': 0
+                    }
+                }
 
                 const playersUrl = 'https://api.jsonbin.io/v3/b';
                 fetch(playersUrl, {
@@ -82,15 +86,24 @@ export default {
                         'Content-Type': 'application/json',
                         'X-Master-key': this.jsonbin_api_key,
                         'X-Collection-Id': this.jsonbin_collection,
-                        'X-Bin-Name': this.playerName,
+                        'X-Bin-Name': this.playerNameTemp,
                     },
                     body: JSON.stringify(playerData)
                 })
                 .then(response => {
+                    if (!response.ok) {
+                        this.errorMsg = Error(response.statusText);
+                        throw Error(response.statusText);
+                    }
                     return response.json();
                 })
                 .then(player => {
-                    // console.log(player);
+                    this.playerID = player.metadata.id;
+                    this.playerName = this.playerNameTemp;
+                    this.playerNameTemp = null;
+                    localStorage.playerName = this.playerName;
+                    this.playerNameSubmitted = true;
+                    this.emitPlayerName();
                 })
                 .catch(err => {
                     console.log(err);
@@ -102,21 +115,25 @@ export default {
         getPlayers() {
             const playersUrl = `https://api.jsonbin.io/v3/c/${this.jsonbin_collection}/bins`;
             fetch(playersUrl, {
-            headers: {
-                'X-Master-key': this.jsonbin_api_key
-            },
+                headers: {
+                    'X-Master-key': this.jsonbin_api_key
+                },
             })
             .then(response => { 
+                if (!response.ok) {
+                    this.errorMsg = response.statusText;
+                    throw Error(response.statusText);
+                }
                 return response.json();
             })
             .then(players => {
-                if (players[0].snippetMeta.name) {
-                    this.players = players
-                    for (const player of this.players) {
-                        this.playerNamesArr.push(player.snippetMeta.name);
-                        if (player.snippetMeta.name == localStorage.playerName) {
-                            this.playerJSONBinId = player.record;
-                        }
+                this.players = players;
+                for (const player of this.players) {
+                    this.playerNamesArr.push(player.snippetMeta.name);
+                    if (player.snippetMeta.name == localStorage.playerName) {
+                        this.playerID = player.record;
+                        this.playerName = localStorage.playerName;
+                        this.emitPlayerName();
                     }
                 }
             })
@@ -127,10 +144,6 @@ export default {
     },
     created() {
         this.getPlayers();
-        if (localStorage.playerName) {
-            this.playerName = localStorage.playerName;
-            this.emitPlayerName();
-        }
     },
     watch: {
         playerNameTemp(value) {

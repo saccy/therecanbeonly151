@@ -1,8 +1,10 @@
 #!/bin/bash
 
-api_key='$2b$10$pA/ASqkuXn1h5R5sDrizg.2M3mwIUNrhf9B2hRXAuLgH5pbP0Rfw.'
-bin_id='61986f1501558c731cc5f78e'
+source .env.local
+
+api_key=$VITE_JSONBIN_API_KEY
 collection_id='6198674562ed886f9151cea6'
+bin_id='619b5fb40ddbee6f8b100dee'
 player_json='{ "saccy": { "high_score": 60, "attempts": 4 }}'
 
 echo 'Getting a bin'
@@ -11,7 +13,7 @@ curl -s \
   -H "X-Master-key: $api_key" \
   --request GET \
     https://api.jsonbin.io/v3/b/${bin_id}/latest |
-    jq .record.saccy.high_score
+    jq -r '.record.saccy.high_score'
 
 # echo 'Creating a bin'
 # player_json='{ "sacco": { "high_score": 60, "attempts": 4 }}'

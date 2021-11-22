@@ -8,8 +8,7 @@
             <h2 class="subtitle"><b>{{ playerName }}</b>, I choose you!</h2>
             <div class="columns">
                 <div class="column is-half is-offset-one-quarter">
-                    <button v-show="!timerEnabled" class="button is-primary is-fullwidth" @click="startGame()">Start game</button>
-                    <button v-show="!timerEnabled" class="button is-primary is-fullwidth" @click="runGameComponentFn()">Run fn in Game component</button>
+                    <button class="button is-primary is-fullwidth" @click="emitStartGame()">Start game</button>
                 </div>
             </div>
         </div>
@@ -24,8 +23,8 @@ export default {
         }
     },
     methods: {
-        runGameComponentFn() {
-            this.$root.$emit('Game')
+        emitStartGame() {
+            this.$emit('startGame')
         }
     }
 }
