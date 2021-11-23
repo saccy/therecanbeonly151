@@ -1,3 +1,5 @@
+// FIXME: bug when you go from endgame to hall of fame, data doesnt load properly for current player.
+
 <template>
   <div>
     <div style="padding-top: 25px;">
