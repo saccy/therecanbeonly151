@@ -6,6 +6,6 @@
 
 # vue create therecanbeonly151
 
-echo "VITE_JSONBIN_API_KEY" > .env
-echo "VITE_JSONBIN_COLLECTION_ID" >> .env
+echo $VITE_JSONBIN_API_KEY > .env
+echo $VITE_JSONBIN_COLLECTION_ID >> .env
 npm run build
