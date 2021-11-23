@@ -8,5 +8,8 @@
 
 echo "VITE_JSONBIN_API_KEY=${VITE_JSONBIN_API_KEY}" > .env
 echo "VITE_JSONBIN_COLLECTION_ID=${VITE_JSONBIN_COLLECTION_ID}" >> .env
-sed -i 's/\$\$\$/\$/g' .env
+echo "VUE_APP_JSONBIN_API_KEY=${VITE_JSONBIN_API_KEY}" > .env
+echo "VUE_APP_JSONBIN_COLLECTION_ID=${VITE_JSONBIN_COLLECTION_ID}" >> .env
+# sed -i 's/\$\$\$/\$/g' .env
+sed -i 's/\$\$\$/\\\$/g' .env
 npm run build
