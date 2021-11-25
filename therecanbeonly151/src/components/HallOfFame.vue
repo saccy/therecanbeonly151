@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="column is-half is-offset-one-quarter">
+        <div v-show="showPlayerInfo" class="column is-half is-offset-one-quarter">
             <h2 class="subtitle"><b>{{ playerName }}</b>, your highest score is <b>{{ currentPlayerHighScore }}</b>!</h2>
         </div>
         <br>
@@ -99,6 +99,14 @@ export default {
         }
     },
     computed: {
+        showPlayerInfo() {
+            if (this.playerName && this.currentPlayerHighScore) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
         
     },
     watch: {

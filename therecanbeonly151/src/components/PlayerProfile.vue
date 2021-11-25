@@ -133,9 +133,9 @@ export default {
                     if (player.snippetMeta.name == localStorage.playerName) {
                         this.playerID = player.record;
                         this.playerName = localStorage.playerName;
-                        this.emitPlayerName();
                     }
                 }
+                this.emitPlayerName();
             })
             .catch(err => {
                 console.log(err);

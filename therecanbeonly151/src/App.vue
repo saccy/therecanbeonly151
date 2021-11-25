@@ -2,14 +2,16 @@
 
 <template>
   <div>
-    <div style="padding-top: 25px;">
-      <button v-show="!hallOfFame" class="subtitle button button is-info is-inverted" @click="hallOfFameFn">Hall of Fame</button>
-      <a href="/" v-show="hallOfFame" class="subtitle button button is-info is-inverted">Back to game</a>
+    <div v-show="!hallOfFame" style="padding-top: 30px;">
+      <a class="subtitle button button is-info is-inverted" @click="hallOfFameFn">Hall of Fame</a>
     </div>
-    <section class="section is-small" style="padding-top: 0px;">
+    <div v-show="hallOfFame" style="padding-top: 30px;">
+      <a href="/" class="subtitle button button is-info is-inverted">Back to game</a>
+    </div>
+    <section class="section is-small" style="padding-top: 10px;">
       <div class="container">
 
-        <img src="./assets/pika.png" width="200" height="200" />
+        <img :src="pokePic" width="200" height="200" />
         <h1 class="title">Original pokemans is best pokemans</h1>
         <hr>
 
@@ -75,6 +77,10 @@ import Game from './components/Game.vue'
 import EndGame from './components/EndGame.vue'
 import HallOfFame from './components/HallOfFame.vue'
 import PlayerProfile from './components/PlayerProfile.vue'
+import pikaImage from './assets/pikachu.png';
+import bulbaImage from './assets/bulbasaur.png';
+import charImage from './assets/charmander.png';
+import squirtImage from './assets/squirtle.png';
 
 export default {
   name: 'App',
@@ -102,6 +108,11 @@ export default {
       points: 0,
       getTop10: false,
       getPlayerData: false,
+      pokePic: '',
+      squirtImage: squirtImage,
+      bulbaImage: bulbaImage,
+      pikaImage: pikaImage,
+      charImage: charImage
     }
   },
    methods: {
@@ -118,7 +129,9 @@ export default {
       this.playerName = player.name;
       this.playerID = player.id;
       this.players = player.players; // FIXME this var name sucks (emitted from PlayeProfile component)
-      this.playerProfile = false;
+      if (this.playerName) {
+        this.playerProfile = false;
+      }
     },
     preGameFn() {
       this.hallOfFame = false;
@@ -147,6 +160,10 @@ export default {
   },
   mounted() {
     console.log(`${import.meta.env.MODE} mode`)
-  }
+  },
+  created() {
+    var pokePicArr = [this.pikaImage, this.charImage, this.bulbaImage, this.squirtImage]
+    this.pokePic = pokePicArr[Math.floor(Math.random() * pokePicArr.length)];
+  },
 }
 </script>
