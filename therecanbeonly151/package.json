@@ -5,7 +5,7 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview --port 3000",
-    "start": "serve dist -l tcp://0.0.0.0:${PORT:-8080} -n"
+    "start": "serve dist"
   },
   "dependencies": {
     "bulma": "^0.9.3",
