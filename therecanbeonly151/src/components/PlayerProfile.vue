@@ -116,7 +116,8 @@ export default {
             const playersUrl = `https://api.jsonbin.io/v3/c/${this.jsonbin_collection}/bins`;
             fetch(playersUrl, {
                 headers: {
-                    'X-Master-key': this.jsonbin_api_key
+                    'X-Master-key': this.jsonbin_api_key,
+                    "Access-Control-Allow-Origin": "*"
                 },
             })
             .then(response => { 
