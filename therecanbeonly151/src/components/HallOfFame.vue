@@ -65,7 +65,8 @@ export default {
                 const playerBinUrl = `https://api.jsonbin.io/v3/b/${id}/latest`
                 fetch(playerBinUrl, {
                     headers: {
-                        'X-Master-key': this.jsonbin_api_key
+                        'X-Master-key': this.jsonbin_api_key,
+                        "Access-Control-Allow-Origin": "*"
                     },
                 })
                 .then(response => { 
